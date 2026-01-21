@@ -1,0 +1,38 @@
+name: Pandas 3 Compatibility Check
+
+on:
+  push:
+  workflow_dispatch: # Allows manual trigger from the UI
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # matrix runs two separate jobs at the same time
+        pandas-version: ["2.3.3", "3.0.0"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas==${{ matrix.pandas-version }}
+          pip install pytest pytest-cov
+          pip install -e .
+
+      - name: Run Tests
+        run: |
+          # Treat warnings as errors for 2.3.3 to catch deprecated code
+          if [ "${{ matrix.pandas-version }}" == "2.3.3" ]; then
+            python -W error -m pytest gwlearn/
+          else
+            pytest gwlearn/
+          fi
