@@ -30,7 +30,7 @@ jobs:
           pip install pytest pytest-cov
           pip install -e .
           # Install missing external data dependencies required for tests
-          pip install **geodatasets geopandas scikit-learn**
+          pip install geodatasets geopandas scikit-learn
 
       - name: Run Tests
         run: |
